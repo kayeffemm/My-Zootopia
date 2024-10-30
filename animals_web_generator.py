@@ -1,13 +1,15 @@
 import json
 
 def main():
-    animal_content_list = get_animal_content("animals_data.json")
-    print_animal_content(animal_content_list)
+    html_template = read_html_template("animals_template.html")
+    animal_data = get_animal_content("animals_data.json")
+    new_html_string = add_data_to_template(html_template, animal_data)
+    write_html_file(new_html_string)
 
 
 def load_data(file_path: str) -> list:
     """
-    Loads a JSON file.
+    Loads a JSON file and returns data as list.
     :param file_path: string
     :return: list
     """
@@ -15,38 +17,61 @@ def load_data(file_path: str) -> list:
         return json.load(handle)
 
 
-def get_animal_content(file_path: str) -> list:
+def read_html_template(file_path: str) -> str:
     """
-    Gets animal name, diet, location and type if this information exists in given JSON and returns a list.
+    Loads html file and returns data as string.
     :param file_path: string
-    :return: list
+    :return: string
+    """
+    with open(file_path, "r") as template:
+        return template.read()
+
+
+def write_html_file(html_data: str) -> None:
+    """
+    Creates a new HTML file with provided data.
+    :param html_data: string
+    :return: None
+    """
+    with open("animals.html", "w") as new_file:
+        new_file.write(html_data)
+
+
+def add_data_to_template(template: str, content: str) -> str:
+    """
+    adds content to given template string:
+    :param template: string
+    :param content: string
+    :return: string
+    """
+    content_added = template.replace("__REPLACE_ANIMALS_INFO__", content)
+    return content_added
+
+
+def get_animal_content(file_path: str) -> str:
+    """
+    Gets animal name, diet, location and type if this information exists in given JSON and returns a string.
+    :param file_path: string
+    :return: string
     """
     animals_data = load_data(file_path)
-    animals_content_list = []
+    output = ""
+
     for animal in animals_data:
         animal_name = animal.get("name")
         animal_diet = animal.get("characteristics", {}).get("diet")
         animal_first_location = animal.get("locations")[0]
         animal_type = animal.get("characteristics", {}).get("type")
+        output += f"Name: {animal_name}\n"
+        if animal_diet:
+            output += f"Diet: {animal_diet}\n"
+        if animal_first_location:
+            output += f"Location: {animal_first_location}\n"
+        if animal_type:
+            output += f"Type: {animal_type}\n"
+        output += "\n"
 
-        animals_content_list.append({"Name": animal_name,
-                                "Diet": animal_diet,
-                                "Location": animal_first_location,
-                                "Type": animal_type
-                                })
-    return animals_content_list
-
-def print_animal_content(animals_content_list: list) -> None:
-    """
-    Prints animal Content but only if value != None.
-    :param animals_content_list: list
-    :return: None
-    """
-    for animal in animals_content_list:
-        for key, value in animal.items():
-            if value:
-                print(f"{key}: {value}")
-        print()
+    return output
 
 
 if __name__ == "__main__":
