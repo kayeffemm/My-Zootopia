@@ -1,11 +1,13 @@
 import json
 
-def main():
-    html_template = read_html_template("animals_template.html")
-    animal_data = serialize_animal_content("animals_data.json")
+PLACEHOLDER = "__REPLACE_ANIMALS_INFO__"
+
+
+def main(template_path="animals_template.html", data_path="animals_data.json", output_path="animals.html"):
+    html_template = read_html_template(template_path)
+    animal_data = create_html_string(data_path)
     new_html_string = add_data_to_template(html_template, animal_data)
-    write_html_file(new_html_string)
-    print(new_html_string)
+    write_html_file(output_path, new_html_string)
 
 
 def load_data(file_path: str) -> list:
@@ -28,13 +30,14 @@ def read_html_template(file_path: str) -> str:
         return template.read()
 
 
-def write_html_file(html_data: str) -> None:
+def write_html_file(file_path: str, html_data: str) -> None:
     """
     Creates a new HTML file with provided data.
+    :param file_path: string
     :param html_data: string
     :return: None
     """
-    with open("animals.html", "w") as new_file:
+    with open(file_path, "w") as new_file:
         new_file.write(html_data)
 
 
@@ -45,37 +48,45 @@ def add_data_to_template(template: str, content: str) -> str:
     :param content: string
     :return: string
     """
-    content_added = template.replace("__REPLACE_ANIMALS_INFO__", content)
-    return content_added
+    return template.replace(PLACEHOLDER, content)
 
 
-def serialize_animal_content(file_path: str) -> str:
+def create_html_string(file_path: str) -> str:
     """
-    Gets animal name, diet, location and type if this information exists in given JSON and returns an HTML string.
+    Generates an HTML string from JSON data at the provided file path.
     :param file_path: string
     :return: string
     """
     animals_data = load_data(file_path)
-    output = ""
+    return "".join(serialize_animal(animal) for animal in animals_data)
 
-    for animal in animals_data:
-        animal_name = animal.get("name")
-        animal_diet = animal.get("characteristics", {}).get("diet")
-        animal_first_location = animal.get("locations")[0]
-        animal_type = animal.get("characteristics", {}).get("type")
 
-        output += '<li class="cards__item">'
-        output += f'<div class="card__title">{animal_name}</div>\n'
-        output += '<p class="card__text">'
-        if animal_diet:
-            output += f'<strong>Diet:</strong> {animal_diet}<br/>\n'
-        if animal_first_location:
-            output += f'<strong>Location:</strong> {animal_first_location}<br/>\n'
-        if animal_type:
-            output += f'<strong>Type:</strong> {animal_type}<br/>\n'
-        output += '</p>\n</li>\n'
+def serialize_animal(animal_obj: dict) -> str:
+    """
+    Gets a single animal object and serializes it to an HTML string.
+    :param animal_obj: dict
+    :return: string
+    """
+    animal_name = animal_obj.get("name", "Unknown")
+    animal_diet = animal_obj.get("characteristics", {}).get("diet", "Unknown")
+    animal_first_location = next(iter(animal_obj.get("locations", [])), "Unknown")
+    animal_type = animal_obj.get("characteristics", {}).get("type", "Unknown")
 
-    return output
+    html_string = '<li class="cards__item">'
+    html_string += f'<div class="card__title">{animal_name}</div>\n'
+    html_string += '<p class="card__text">'
+    html_string += format_animal_attribute("Diet", animal_diet)
+    html_string += format_animal_attribute("Location", animal_first_location)
+    html_string += format_animal_attribute("Type", animal_type)
+    html_string += '</p>\n</li>\n'
+
+    return html_string
+
+
+def format_animal_attribute(label: str, value: str) -> str:
+    if value and value != "Unknown":
+        return f"<strong>{label}:</strong> {value}<br/>\n"
+    return ""
 
 
 if __name__ == "__main__":
