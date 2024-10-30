@@ -91,6 +91,12 @@ def serialize_animal(animal_obj: dict) -> str:
 
 
 def format_animal_attribute(label: str, value: str) -> str:
+    """
+    Formats label and value into an HTML list
+    :param label: string
+    :param value: string
+    :return: string
+    """
     if value and value != "Unknown":
         return f"<li><strong>{label}:</strong> {value}</li>\n"
     return ""
