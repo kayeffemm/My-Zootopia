@@ -2,9 +2,10 @@ import json
 
 def main():
     html_template = read_html_template("animals_template.html")
-    animal_data = get_animal_content("animals_data.json")
+    animal_data = serialize_animal_content("animals_data.json")
     new_html_string = add_data_to_template(html_template, animal_data)
     write_html_file(new_html_string)
+    print(new_html_string)
 
 
 def load_data(file_path: str) -> list:
@@ -48,9 +49,9 @@ def add_data_to_template(template: str, content: str) -> str:
     return content_added
 
 
-def get_animal_content(file_path: str) -> str:
+def serialize_animal_content(file_path: str) -> str:
     """
-    Gets animal name, diet, location and type if this information exists in given JSON and returns a string.
+    Gets animal name, diet, location and type if this information exists in given JSON and returns an HTML string.
     :param file_path: string
     :return: string
     """
@@ -62,14 +63,16 @@ def get_animal_content(file_path: str) -> str:
         animal_diet = animal.get("characteristics", {}).get("diet")
         animal_first_location = animal.get("locations")[0]
         animal_type = animal.get("characteristics", {}).get("type")
-        output += f"Name: {animal_name}\n"
+
+        output += '<li class="cards__item">'
+        output += f'Name: {animal_name}<br/>\n'
         if animal_diet:
-            output += f"Diet: {animal_diet}\n"
+            output += f'Diet: {animal_diet}<br/>\n'
         if animal_first_location:
-            output += f"Location: {animal_first_location}\n"
+            output += f'Location: {animal_first_location}<br/>\n'
         if animal_type:
-            output += f"Type: {animal_type}\n"
-        output += "\n"
+            output += f'Type: {animal_type}<br/>\n'
+        output += '</li>\n'
 
     return output
 
