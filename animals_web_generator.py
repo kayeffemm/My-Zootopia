@@ -65,14 +65,15 @@ def serialize_animal_content(file_path: str) -> str:
         animal_type = animal.get("characteristics", {}).get("type")
 
         output += '<li class="cards__item">'
-        output += f'Name: {animal_name}<br/>\n'
+        output += f'<div class="card__title">{animal_name}</div>\n'
+        output += '<p class="card__text">'
         if animal_diet:
-            output += f'Diet: {animal_diet}<br/>\n'
+            output += f'<strong>Diet:</strong> {animal_diet}<br/>\n'
         if animal_first_location:
-            output += f'Location: {animal_first_location}<br/>\n'
+            output += f'<strong>Location:</strong> {animal_first_location}<br/>\n'
         if animal_type:
-            output += f'Type: {animal_type}<br/>\n'
-        output += '</li>\n'
+            output += f'<strong>Type:</strong> {animal_type}<br/>\n'
+        output += '</p>\n</li>\n'
 
     return output
 
