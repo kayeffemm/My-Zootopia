@@ -71,6 +71,9 @@ def serialize_animal(animal_obj: dict) -> str:
     animal_diet = animal_obj.get("characteristics", {}).get("diet", "Unknown")
     animal_first_location = next(iter(animal_obj.get("locations", [])), "Unknown")
     animal_type = animal_obj.get("characteristics", {}).get("type", "Unknown")
+    animal_features = animal_obj.get("characteristics", {}).get("distinctive_feature", "Unknown")
+    animal_color = animal_obj.get("characteristics", {}).get("color", "Unknown")
+    animal_lifespan = animal_obj.get("characteristics", {}).get("lifespan", "Unknown")
 
     html_string = '<li class="cards__item">'
     html_string += f'<div class="card__title">{animal_name}</div>\n'
@@ -78,6 +81,9 @@ def serialize_animal(animal_obj: dict) -> str:
     html_string += format_animal_attribute("Diet", animal_diet)
     html_string += format_animal_attribute("Location", animal_first_location)
     html_string += format_animal_attribute("Type", animal_type)
+    html_string += format_animal_attribute("Features", animal_features)
+    html_string += format_animal_attribute("Color", animal_color)
+    html_string += format_animal_attribute("Lifespan", animal_lifespan)
     html_string += '</p>\n</li>\n'
 
     return html_string
