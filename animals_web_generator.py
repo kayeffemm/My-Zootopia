@@ -5,7 +5,17 @@ API_KEY = "r5QWeiJF2YCkHuYYor8vow==XqJrIrkRFsNIxe5E"
 API_URL = f"https://api.api-ninjas.com/v1/animals?X-Api-Key="
 
 
-def main(template_path="animals_template.html", data_path="animals_data.json", output_path="animals.html"):
+def main(template_path="animals_template.html", output_path="animals.html"):
+    """
+    Main function that drives the program flow:
+    - Reads the HTML template.
+    - Prompts the user for an animal search term.
+    - Fetches data from the API and generates HTML content.
+    - Writes the updated HTML to a specified output file.
+
+    :param template_path: Path to the HTML template file.
+    :param output_path: Path for the final HTML file with animal data.
+    """
     html_template = read_html_template(template_path)
     search_term = get_user_search_term()
     animal_data = create_html_string(search_term)
@@ -15,8 +25,9 @@ def main(template_path="animals_template.html", data_path="animals_data.json", o
 
 def get_user_search_term() -> str:
     """
-    Prompts User to enter the animal name of choice
-    :return: string
+    Prompts the user to enter an animal name for searching.
+
+    :return: A string containing the user's input (search term).
     """
     search_term = input("Please enter the desired animal: ")
     return search_term
@@ -24,11 +35,12 @@ def get_user_search_term() -> str:
 
 def create_full_api_url(api_url: str, api_key: str, search_term: str="monkey"):
     """
-    Creates a full URL string with given data (api_url, api_key, search_term)
-    :param api_url: string
-    :param api_key: string
-    :param search_term: string
-    :return: string
+    Creates a complete API URL with the specified API key and search term.
+
+    :param api_url: Base URL of the API.
+    :param api_key: API key for authorization.
+    :param search_term: Animal name to search in the API.
+    :return: The full API URL with query parameters.
     """
     api_url_string = api_url + api_key + "&name=" + search_term
     return api_url_string
@@ -36,9 +48,10 @@ def create_full_api_url(api_url: str, api_key: str, search_term: str="monkey"):
 
 def requests_data_from_api(search_term: str) -> list:
     """
-    Requests data from API and returns data as list.
-    :param search_term: string
-    :return: list
+    Fetches animal data from the API for the given search term.
+
+    :param search_term: Name of the animal to search.
+    :return: List of animal data dictionaries if the request is successful, otherwise an empty list.
     """
     api_url_string = create_full_api_url(API_URL, API_KEY, search_term)
     try:
@@ -52,9 +65,10 @@ def requests_data_from_api(search_term: str) -> list:
 
 def read_html_template(file_path: str) -> str:
     """
-    Loads html file and returns data as string.
-    :param file_path: string
-    :return: string
+    Reads the contents of an HTML template file and returns it as a string.
+
+    :param file_path: Path to the HTML template file.
+    :return: String containing the HTML template content.
     """
     with open(file_path, "r") as template:
         return template.read()
@@ -62,9 +76,10 @@ def read_html_template(file_path: str) -> str:
 
 def write_html_file(file_path: str, html_data: str) -> None:
     """
-    Creates a new HTML file with provided data.
-    :param file_path: string
-    :param html_data: string
+    Writes the provided HTML data to a specified output file.
+
+    :param file_path: Path for the output HTML file.
+    :param html_data: HTML content to write to the file.
     :return: None
     """
     with open(file_path, "w") as new_file:
@@ -73,29 +88,35 @@ def write_html_file(file_path: str, html_data: str) -> None:
 
 def add_data_to_template(template: str, content: str) -> str:
     """
-    adds content to given template string:
-    :param template: string
-    :param content: string
-    :return: string
+    Replaces the placeholder in the HTML template with the provided content.
+
+    :param template: HTML template string with a placeholder.
+    :param content: HTML content to insert in place of the placeholder.
+    :return: Modified HTML string with the content inserted.
     """
     return template.replace(PLACEHOLDER, content)
 
 
 def create_html_string(search_term: str) -> str:
     """
-    Generates an HTML string from JSON data at the provided file path.
-    :param search_term: string
-    :return: string
+    Generates an HTML string based on JSON data for a specific search term.
+
+    :param search_term: Name of the animal to search in the API.
+    :return: HTML string with animal information or a message indicating the animal was not found.
     """
     animals_data = requests_data_from_api(search_term)
-    return "".join(serialize_animal(animal) for animal in animals_data)
+    if animals_data:
+        return "".join(serialize_animal(animal) for animal in animals_data)
+    else:
+        return f"""<h2>The animal "{search_term}" doesn't exist.</h2>"""
 
 
 def serialize_animal(animal_obj: dict) -> str:
     """
-    Gets a single animal object and serializes it to an HTML string.
-    :param animal_obj: dict
-    :return: string
+    Serializes a single animal object into an HTML string representation.
+
+    :param animal_obj: Dictionary containing animal data.
+    :return: HTML list item string for the animal, with placeholders for missing attributes.
     """
     animal_name = animal_obj.get("name", "Unknown")
     animal_first_location = next(iter(animal_obj.get("locations", [])), "Unknown")
@@ -122,10 +143,11 @@ def serialize_animal(animal_obj: dict) -> str:
 
 def format_animal_attribute(label: str, value: str) -> str:
     """
-    Formats label and value into an HTML list
-    :param label: string
-    :param value: string
-    :return: string
+    Formats a label and value as an HTML list item if the value is present.
+
+    :param label: Attribute label (e.g., "Location").
+    :param value: Attribute value; only included if it's not "Unknown".
+    :return: HTML string for the attribute, or an empty string if the value is missing.
     """
     if value and value != "Unknown":
         return f"<li><strong>{label}:</strong> {value}</li>\n"
