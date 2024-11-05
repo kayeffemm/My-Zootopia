@@ -1,23 +1,38 @@
-import json
+import requests
 
 PLACEHOLDER = "__REPLACE_ANIMALS_INFO__"
+API_KEY = "r5QWeiJF2YCkHuYYor8vow==XqJrIrkRFsNIxe5E"
+API_URL = f"https://api.api-ninjas.com/v1/animals?X-Api-Key="
 
 
 def main(template_path="animals_template.html", data_path="animals_data.json", output_path="animals.html"):
     html_template = read_html_template(template_path)
-    animal_data = create_html_string(data_path)
+    animal_data = create_html_string()
     new_html_string = add_data_to_template(html_template, animal_data)
     write_html_file(output_path, new_html_string)
 
 
-def load_data(file_path: str) -> list:
+def create_full_api_url(api_url: str, api_key: str, search_term: str="monkey"):
     """
-    Loads a JSON file and returns data as list.
-    :param file_path: string
+    Creates a full URL string with given data (api_url, api_key, search_term)
+    :param api_url: string
+    :param api_key: string
+    :param search_term: string
+    :return: string
+    """
+    api_url_string = api_url + api_key + "&name=" + search_term
+    return api_url_string
+
+
+def requests_data_from_api() -> list:
+    """
+    Requests data from API and returns data as list.
     :return: list
     """
-    with open(file_path, "r") as handle:
-        return json.load(handle)
+    api_url_string = create_full_api_url(API_URL, API_KEY)
+    animal_data = requests.get(api_url_string)
+    animal_data_list = animal_data.json()
+    return animal_data_list
 
 
 def read_html_template(file_path: str) -> str:
@@ -51,13 +66,12 @@ def add_data_to_template(template: str, content: str) -> str:
     return template.replace(PLACEHOLDER, content)
 
 
-def create_html_string(file_path: str) -> str:
+def create_html_string() -> str:
     """
     Generates an HTML string from JSON data at the provided file path.
-    :param file_path: string
     :return: string
     """
-    animals_data = load_data(file_path)
+    animals_data = requests_data_from_api()
     return "".join(serialize_animal(animal) for animal in animals_data)
 
 
