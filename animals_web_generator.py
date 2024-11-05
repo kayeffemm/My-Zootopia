@@ -7,9 +7,19 @@ API_URL = f"https://api.api-ninjas.com/v1/animals?X-Api-Key="
 
 def main(template_path="animals_template.html", data_path="animals_data.json", output_path="animals.html"):
     html_template = read_html_template(template_path)
-    animal_data = create_html_string()
+    search_term = get_user_search_term()
+    animal_data = create_html_string(search_term)
     new_html_string = add_data_to_template(html_template, animal_data)
     write_html_file(output_path, new_html_string)
+
+
+def get_user_search_term() -> str:
+    """
+    Prompts User to enter the animal name of choice
+    :return: string
+    """
+    search_term = input("Please enter the desired animal: ")
+    return search_term
 
 
 def create_full_api_url(api_url: str, api_key: str, search_term: str="monkey"):
@@ -24,15 +34,20 @@ def create_full_api_url(api_url: str, api_key: str, search_term: str="monkey"):
     return api_url_string
 
 
-def requests_data_from_api() -> list:
+def requests_data_from_api(search_term: str) -> list:
     """
     Requests data from API and returns data as list.
+    :param search_term: string
     :return: list
     """
-    api_url_string = create_full_api_url(API_URL, API_KEY)
-    animal_data = requests.get(api_url_string)
-    animal_data_list = animal_data.json()
-    return animal_data_list
+    api_url_string = create_full_api_url(API_URL, API_KEY, search_term)
+    try:
+        animal_data = requests.get(api_url_string)
+        animal_data_list = animal_data.json()
+        return animal_data_list
+    except requests.RequestException as e:
+        print("Error: ", e)
+        return []
 
 
 def read_html_template(file_path: str) -> str:
@@ -66,12 +81,13 @@ def add_data_to_template(template: str, content: str) -> str:
     return template.replace(PLACEHOLDER, content)
 
 
-def create_html_string() -> str:
+def create_html_string(search_term: str) -> str:
     """
     Generates an HTML string from JSON data at the provided file path.
+    :param search_term: string
     :return: string
     """
-    animals_data = requests_data_from_api()
+    animals_data = requests_data_from_api(search_term)
     return "".join(serialize_animal(animal) for animal in animals_data)
 
 
