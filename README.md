@@ -50,7 +50,7 @@ The project uses the Animals API from API Ninjas to fetch data on a specified an
 
 1. Run the program:
    ```bash
-   python main.py
+   python animals_web_generator.py
    ```
 
 2. Follow the prompt to enter the animal name. For example:
