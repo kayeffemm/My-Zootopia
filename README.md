@@ -64,11 +64,13 @@ The project uses the Animals API from API Ninjas to fetch data on a specified an
 
 ```plaintext
 My-Zootopia/
-├── main.py              # Main script for executing the program
-├── animals_template.html # HTML template for displaying animal info
-├── .env                 # Environment file storing API key
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation
+├── animals_web_generator.py    # Main script for executing the program
+├── data_fetcher.py             # script for communicating with Animals-API
+├── animals_template.html       # HTML template for displaying animal info
+├── animals.html                # Final HTML which displays the information
+├── .env                        # Environment file storing API key
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
 ```
 
 ## Technologies
