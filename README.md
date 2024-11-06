@@ -10,7 +10,6 @@ My Zootopia is a Python-based project that retrieves and displays information ab
 - [Usage](#usage)
 - [File Structure](#file-structure)
 - [Technologies](#technologies)
-- [License](#license)
 
 ## Overview
 
